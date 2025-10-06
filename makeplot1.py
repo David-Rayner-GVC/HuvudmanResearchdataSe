@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import config
 from config import OUT_DATA, TABLES, RESULTS
 import json
+import sys
 
 def plot_publisher_repo_by_year(publisher, df):
     """
@@ -55,3 +56,12 @@ def plot_publisher_repo_by_year(publisher, df):
     plt.show()
 
     return pivot
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python makeplot1.py csvfile publisher")
+        sys.exit(1)
+
+    df = pd.read_csv(sys.argv[1])
+    publisher = sys.argv[2]
+    plot_publisher_repo_by_year(publisher, df)
