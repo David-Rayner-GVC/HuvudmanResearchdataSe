@@ -1,0 +1,16 @@
+name: hrs
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - requests
+  - pandas
+  - pip
+  - pprintpp
+  - extruct
+  - openpyxl
+  - ipython
+  - matplotlib
+  - shiny
+  
+  
