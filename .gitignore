@@ -1,8 +1,5 @@
 # This project
 **/ignore/
-in_data/*
-out_data/*
-dashboard/data/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
