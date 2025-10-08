@@ -2,9 +2,8 @@ import numpy as np # numerical python
 import pandas as pd # pannel datasets
 import matplotlib.pyplot as plt 
 #import seaborn as sns
-import config
-from config import OUT_DATA, TABLES, RESULTS
-import json
+#from config import OUT_DATA, TABLES, RESULTS
+#import json
 import sys
 
 def plot_publisher_repo_by_year(publisher, df):
@@ -53,9 +52,8 @@ def plot_publisher_repo_by_year(publisher, df):
     ax.set_title(f"Publications by year for {publisher}")
     ax.legend(title="SourceRepository")
     plt.tight_layout()
-    plt.show()
 
-    return pivot
+    return fig
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:

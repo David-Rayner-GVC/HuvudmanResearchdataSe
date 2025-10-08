@@ -1,20 +1,20 @@
 # HuvudmanResarchdataSe 
 A publisher / source perspective on who publishes datasets that are indexed in the Researchdata.se research data portal.
 
+## Folder commmon
+Stuff useful for both predata and dashboard!
 
+## Folder prepdata
+Code for creating a lite csv file that can be used in the dashboard.
 
-## Running the analysis
 read_metadata.py - currently reads the mega json dump from file (specified on command line) and writes a csv file with "Publisher", "SourceRepository", "YearPublished".
                   Outfile is also specified on the command line, but target out_data/researchdata_datasets.csv
                   Problem here is that there is no URL, so we can't back off to version 1 to see when first published!
 
-generate_data1.py - this reads data from the schema.org, but there is no info on the source there!!
- researchdata_datasets.jsonl file has fields:
-  - URL - Researchdata.se landing page.
-  - SourceRepository - Determined from the URL(!). "DORIS", "ECDS", "DORIS_EXTERNAL", or "OTHER". 
-  - Version - Generally 0 for OTHER, 1 or 1.0 otherwise
-  - YearPublished - YYYY 
-  - Publisher1 - huvudman
+generate_data1.py - this reads data from the schema.org, but there is no info on the source there!! THIS FILE IS NOT UP-TO-DATE
+
+## Folder dashboard
+shiny app to show results.
 
 Make web-app first, then start to develop more!
 
