@@ -1,0 +1,14 @@
+
+Notes on what year to use for the date!
+
+https://spraakbanken.gu.se/en/resources/forarbeten1734
+
+here we have a bz2 file from 2014 and a zip file from 2025
+
+The Researchdata.se for the dataset
+https://researchdata.se/sv/catalogue/dataset/doi-10-23695-nfk0-7s39
+
+has Publicerad:2024-01-01|Uppdaterad:2014-12-08
+
+whcih makes me think the publication date is when it got DOIed
+

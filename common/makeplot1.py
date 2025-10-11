@@ -51,6 +51,8 @@ def plot_publisher_repo_by_year(publisher, df):
     ax.set_ylabel("Number of publications")
     ax.set_title(f"Publications by year for {publisher}")
     ax.legend(title="SourceRepository")
+
+    fig.autofmt_xdate()
     plt.tight_layout()
 
     return fig
@@ -62,4 +64,5 @@ if __name__ == "__main__":
 
     df = pd.read_csv(sys.argv[1])
     publisher = sys.argv[2]
-    plot_publisher_repo_by_year(publisher, df)
+    fig = plot_publisher_repo_by_year(publisher, df)
+    plt.show()
