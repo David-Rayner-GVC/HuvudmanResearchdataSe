@@ -2,6 +2,9 @@ from bs4 import BeautifulSoup
 import requests
 import lxml
 import json
+import re
+
+dorisPattern = re.compile(r"\d\d\d\d-\d+[-\d+]?")
 
 # source: https://jackwhitworth.com/python/get-xml-sitemap-using-python/
 
@@ -32,20 +35,28 @@ def get_urls_from_sitemap(url) -> list:
     print("Found " + str(len(website_links)) + " links")
     return(website_links)
 
-def classify_url(url):
+def classify_url(id=None, url=None):
     """
     Classify a url as DORIS or OTHER
     """
-    three = url[45:48]
+    if id is None and url is not None:
+      id = url[45:]
     
-    if (three.isdigit() or three=='snd'):
+    if (id[0:3]=='snd'):
         return "DORIS"
-    elif (three=='ecd'):
-        return "ECDS"
-    elif (three=='ext'):
-        return "DORIS_EXTERNAL"
-    else:
-        return "OTHER"
+    if (id[0:4]=='ecds'):
+        return "DORIS"
+    if (dorisPattern.match(id)):
+        return "DORIS"
+    if (id[0:3]=='ext'):
+        return "DORIS (only metadata)"
+    if (dorisPattern.match(id)):
+        return "DORIS"
+    if (id[0:4]=="icos"):
+        return("ICOS Sweden data portal")
+    if id.startswith('doi-10-23695'): return('Språkbanken Text')
+    if id.startswith('doi-10-17044-scilifelab'): return('SciLifeLab Data Repository')
+    return "OTHER"
 
 def jsonl_load(filename):
     data = []

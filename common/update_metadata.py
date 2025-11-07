@@ -4,6 +4,8 @@ from w3lib.html import get_base_url
 import json
 import os.path
 import utils
+import sys
+import pandas as pd
 
 def fix_date(j):
     """
@@ -30,13 +32,6 @@ def extract_metadata(url):
     Source:
         https://practicaldatascience.co.uk/data-science/how-to-scrape-schemaorg-metadata-using-python
     """
-    three = url[45:48]
-    if (three.isdigit() or three=='ext'):
-        url_try_order = [url+'/1', url+'/1.0', url]
-    elif (three=='ecd' or three=='snd'):
-        url_try_order = [url+'/1.0', url+'/1', url]
-    else:
-        url_try_order = [url]
     
     r = requests.get(url)
 
@@ -50,7 +45,7 @@ def extract_metadata(url):
     return metadata[0]
 
 
-def get_new_sitemap_links(data):
+def add_new_datasets_from_sitemap(data):
   """
   Update metdata by looking for new datasets from sitemap.xml
   data - dataframe from existing metadata.csv
@@ -73,17 +68,40 @@ def get_new_sitemap_links(data):
 
   if data is None or data.empty:
     new_ids = sitemap_ids
-    # ==> now create data from the ids! 
     data = []
   else:   
     old_ids = set(data['DatasetIdentifier'])
-    old_ids_to_keep = old_ids.intersection(new_ids)
+    old_ids_to_keep = old_ids.intersection(sitemap_ids)
     boolean_mask = data['DatasetIdentifier'].isin(old_ids_to_keep)
     data = data.loc[boolean_mask]
 
     new_ids = sitemap_ids.difference(old_ids)
-    # ==> now create new_data from the new_ids! 
-    # then combine with data and return!
+    numIds = len(new_ids)
+    print(f"found {numIds} new datasaets to process in sitemap")
 
-  return data
+  df = pd.DataFrame(columns=["DatasetIdentifier","DatasetIdentifierV1","Publisher", "SourceRepository", "YearPublished"])
+  for id in list(new_ids):
+    url = "https://researchdata.se/en/catalogue/dataset/" + id
+    try:
+        j = extract_metadata(url)
+        new_row = [id,id,j['publisher']['name'],utils.classify_url(id=id),j['datePublished'][0:4]]
+        print(new_row)
+        df.loc[len(df)] = new_row
+    except KeyboardInterrupt:
+        exit()
+    except:
+        print("WARNING! Error processing new URL " + url)
+     
   
+  data2 = pd.concat([data, df])
+  return data2
+  
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python update_metadata.py ../dashboard/data/metadata.csv")
+        sys.exit(1)
+
+    data = pd.read_csv(sys.argv[1])
+    data2 = add_new_datasets_from_sitemap(data)
+    data2.to_csv(sys.argv[1], index=False, float_format='%.3f') 
+
