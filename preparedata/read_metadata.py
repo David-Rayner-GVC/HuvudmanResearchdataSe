@@ -13,6 +13,7 @@ if str(common_path) not in sys.path:
 
 from update_metadata import fix_date
 
+
 def read_metadata(infile_path, outfile_path):
     df = pd.DataFrame(columns=["DatasetIdentifier","DatasetIdentifierV1","Publisher", "SourceRepository", "YearPublished"])
     with open(infile_path, 'r', encoding='utf-8') as infile:
@@ -29,7 +30,7 @@ def read_metadata(infile_path, outfile_path):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: python read_metadata.py in_data/metadata.jsonl ../dashboard/data/metadata.csv")
+        print("Usage: python read_metadata.py in_data/metadata.jsonl out_data/metadata.csv")
         sys.exit(1)
 
     read_metadata(sys.argv[1], sys.argv[2])

@@ -1,9 +1,7 @@
 
 UP TO HERE!
-
+- update the dashboard/data/metadata.csv
 - check the dashboard still works with the updated dashboard/data/metadata.csv
-- reverse-engineer a startswith -> source mapping from the original metadata.csv (there is a copy in data/)
-- make a new metadata.csv
 - deploy before the Researchdata.se annual meeting!!
 
 Notes on what year to use for the date!

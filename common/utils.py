@@ -3,8 +3,11 @@ import requests
 import lxml
 import json
 import re
+import pandas as pd
 
-dorisPattern = re.compile(r"\d\d\d\d-\d+[-\d+]?")
+dorisPattern = re.compile(r"\d\d\d\d-\d+-\d+")
+dorisExtPattern = re.compile(r"\d\d\d\d-\d+")
+prefixes = pd.read_csv('sources.csv')
 
 # source: https://jackwhitworth.com/python/get-xml-sitemap-using-python/
 
@@ -42,20 +45,13 @@ def classify_url(id=None, url=None):
     if id is None and url is not None:
       id = url[45:]
     
-    if (id[0:3]=='snd'):
-        return "DORIS"
-    if (id[0:4]=='ecds'):
-        return "DORIS"
     if (dorisPattern.match(id)):
         return "DORIS"
-    if (id[0:3]=='ext'):
+    if (dorisExtPattern.match(id)):
         return "DORIS (only metadata)"
-    if (dorisPattern.match(id)):
-        return "DORIS"
-    if (id[0:4]=="icos"):
-        return("ICOS Sweden data portal")
-    if id.startswith('doi-10-23695'): return('Språkbanken Text')
-    if id.startswith('doi-10-17044-scilifelab'): return('SciLifeLab Data Repository')
+    for r in prefixes.itertuples(index=False):
+        if id.startswith(r.prefix):
+            return r.SourceRepository
     return "OTHER"
 
 def jsonl_load(filename):
@@ -66,3 +62,29 @@ def jsonl_load(filename):
             if line:  # skip empty lines
                 data.append(json.loads(line))
     return data
+
+def longestCommonPrefix_binary(strs):
+    """
+    Find  the Longest Common Prefix in Strings strs
+    Source: https://medium.com/@reza.shokrzad/decoding-commonalities-finding-the-longest-common-prefix-in-strings-python-code-ff1e496d32be
+    """
+    if not strs:
+        return ""
+
+    # Helper function to check if all strings have the given prefix
+    def is_common_prefix(length):
+        str0, count = strs[0][:length], len(strs)
+        return all(strs[i][:length] == str0 for i in range(1, count))
+
+    # Binary search for the smallest length at which not all strings match
+    min_length = min(len(s) for s in strs)
+    low, high = 1, min_length
+    
+    while low <= high:
+        mid = (low + high) // 2
+        if is_common_prefix(mid):
+            low = mid + 1
+        else:
+            high = mid - 1
+            
+    return strs[0][:(low + high) // 2]

@@ -45,7 +45,7 @@ def extract_metadata(url):
     return metadata[0]
 
 
-def add_new_datasets_from_sitemap(data):
+def add_new_datasets_from_sitemap(data,verbose=False):
   """
   Update metdata by looking for new datasets from sitemap.xml
   data - dataframe from existing metadata.csv
@@ -64,7 +64,8 @@ def add_new_datasets_from_sitemap(data):
   sitemap_links = sitemap_links.difference(collection_links)
   sitemap_ids = set(map(lambda x: x.rsplit('/', 1)[-1], sitemap_links))
 
-  print("sitemap.xml contains %d links after removing collections" % len(sitemap_links))
+  if verbose:
+    print("sitemap.xml contains %d links after removing collections" % len(sitemap_links))
 
   if data is None or data.empty:
     new_ids = sitemap_ids
@@ -77,7 +78,8 @@ def add_new_datasets_from_sitemap(data):
 
     new_ids = sitemap_ids.difference(old_ids)
     numIds = len(new_ids)
-    print(f"found {numIds} new datasaets to process in sitemap")
+    if verbose:
+        print(f"found {numIds} new datasaets to process in sitemap")
 
   df = pd.DataFrame(columns=["DatasetIdentifier","DatasetIdentifierV1","Publisher", "SourceRepository", "YearPublished"])
   for id in list(new_ids):
@@ -85,7 +87,8 @@ def add_new_datasets_from_sitemap(data):
     try:
         j = extract_metadata(url)
         new_row = [id,id,j['publisher']['name'],utils.classify_url(id=id),j['datePublished'][0:4]]
-        print(new_row)
+        if verbose:
+           print(new_row)
         df.loc[len(df)] = new_row
     except KeyboardInterrupt:
         exit()
@@ -95,13 +98,24 @@ def add_new_datasets_from_sitemap(data):
   
   data2 = pd.concat([data, df])
   return data2
+
+def update_metadata_files(infile, outfile=None):
+    data = pd.read_csv(infile)
+    verbose = outfile is None
+    data2 = add_new_datasets_from_sitemap(data,verbose)
+    if not outfile is None:
+        data2.to_csv(outfile, index=False, float_format='%.3f') 
+
+
   
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    if not ((len(sys.argv) == 3) or (len(sys.argv) == 2)):
         print("Usage: python update_metadata.py ../dashboard/data/metadata.csv")
+        print("Usage: python update_metadata.py ../dashboard/data/metadata.csv ../dashboard/data/metadata_new.csv")
         sys.exit(1)
 
-    data = pd.read_csv(sys.argv[1])
-    data2 = add_new_datasets_from_sitemap(data)
-    data2.to_csv(sys.argv[1], index=False, float_format='%.3f') 
+    if len(sys.argv) == 2:
+        update_metadata_files(sys.argv[1], None)
+    else:
+        update_metadata_files(sys.argv[1], sys.argv[2]) 
 
