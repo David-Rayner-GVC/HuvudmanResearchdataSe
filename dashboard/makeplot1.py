@@ -48,8 +48,8 @@ def plot_publisher_repo_by_year(publisher, df):
         bottom += values
 
     ax.set_xlabel("Year")
-    ax.set_ylabel("Number of publications")
-    ax.set_title(f"Publications by year for {publisher}")
+    ax.set_ylabel("Number of datasets")
+    ax.set_title(f"Published datasets by year for {publisher}")
     ax.legend(title="SourceRepository")
 
     fig.autofmt_xdate()

@@ -4,10 +4,16 @@ import lxml
 import json
 import re
 import pandas as pd
+from pathlib import Path
 
 dorisPattern = re.compile(r"\d\d\d\d-\d+-\d+")
 dorisExtPattern = re.compile(r"\d\d\d\d-\d+")
-prefixes = pd.read_csv('sources.csv')
+
+# Resolve the directory where *this* file lives
+_module_dir = Path(__file__).parent
+# Build an absolute path to sources.csv in the same folder
+_prefix_path = _module_dir / 'sources.csv'
+prefixes = pd.read_csv(_prefix_path)
 
 # source: https://jackwhitworth.com/python/get-xml-sitemap-using-python/
 
@@ -52,7 +58,8 @@ def classify_url(id=None, url=None):
     for r in prefixes.itertuples(index=False):
         if id.startswith(r.prefix):
             return r.SourceRepository
-    return "OTHER"
+    return "UNKNOWN"
+
 
 def jsonl_load(filename):
     data = []

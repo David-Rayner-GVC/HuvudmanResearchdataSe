@@ -82,7 +82,7 @@ def add_new_datasets_from_sitemap(data,verbose=False):
     if verbose:
         print(f"found {numIds} new datasaets to process in sitemap.xml")
 
-  df = pd.DataFrame(columns=["DatasetIdentifier","DatasetIdentifierV1","Publisher", "SourceRepository", "YearPublished"])
+  df = pd.DataFrame(columns=["DatasetIdentifier","Publisher", "SourceRepository", "YearPublished"])
   for id in list(new_ids):
     url = "https://researchdata.se/en/catalogue/dataset/" + id
     try:
@@ -90,7 +90,7 @@ def add_new_datasets_from_sitemap(data,verbose=False):
         SourceRepository=utils.classify_url(id=id)
         if SourceRepository=="ZENODO_COMMUNITY":
           SourceRepository=get_zenodo_community(id,True)
-        new_row = [id,id,j['publisher']['name'],SourceRepository,j['datePublished'][0:4]]
+        new_row = [id,j['publisher']['name'],SourceRepository,j['datePublished'][0:4]]
         if verbose:
            print(new_row)
         df.loc[len(df)] = new_row

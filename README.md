@@ -26,8 +26,9 @@ Converting jsonl to json is useful if your pretty-printer doesn't like jsonl....
 
 ## Folder common
 ### update_metadata.py
-Use this both for making an update to prepdata/out_data/metadata.csv => dashboard/data/metadata.csv
-But it is (intended to be) also used by dashboard to get a final update! Note that even when we get SourceRepository in the json-ld, we will still need to have a static dashboard/data/metadata.csv that is updated, or else the UI will be too slow. Unless SND IT make a specific endpoint to support the tool, of course, that would be nice!
+Use this both for making an update to the pre-loaded metadata 
+python update_metadata.py ../prepdata/out_data/metadata.csv => ../dashboard/data/metadata.csv
+But it is (intended to be) also used by dashboard to get a final update too! Note that even when we get SourceRepository in the json-ld, we will still need to have a static dashboard/data/metadata.csv that is updated, or else the UI will be too slow. Unless SND IT make a specific endpoint to support the tool, of course, that would be nice!
 
 ## Folder dashboard
 shiny app to show results.
@@ -38,13 +39,18 @@ shiny run app3.py
 ## Roadmap
 Make web-app first, then start to develop more!
 
+Note that you don't need to actually ship the full dataset listing (metadata.csv) with the dashboard, you only need the pivot information from makeplot1.py!
+
 Ideas for the interactive dashboard!
-v1 as now, just be able to select publisher. radio-button from list?
-v1a - list publisher by popularity or alphabetical, or search.
 
-v2 - total (ie not by year)
 
-v3 - line plots by source as alternative to stacked bar chart
+  - list publisher by popularity or alphabetical, or search.
+
+  - show as total (ie not by year)
+
+  - line plots by source as alternative to stacked bar chart
+
+  - radio-buttons to select/deslect which Repositories are shown.
 
 
 

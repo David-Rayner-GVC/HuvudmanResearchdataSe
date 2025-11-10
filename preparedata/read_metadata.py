@@ -15,7 +15,7 @@ from update_metadata import fix_date
 
 
 def read_metadata(infile_path, outfile_path):
-    df = pd.DataFrame(columns=["DatasetIdentifier","DatasetIdentifierV1","Publisher", "SourceRepository", "YearPublished"])
+    df = pd.DataFrame(columns=["DatasetIdentifier","Publisher", "SourceRepository", "YearPublished"])
     with open(infile_path, 'r', encoding='utf-8') as infile:
         for line in infile:
             line = line.strip()
@@ -23,7 +23,7 @@ def read_metadata(infile_path, outfile_path):
                 continue  # skip empty lines
             else:
                 j = json.loads(line)
-                new_row = [j['datasetIdentifier'],j['datasetIdentifier'],j['principal']['name']['en'],j['source']['name']['en'],fix_date(j)]
+                new_row = [j['datasetIdentifier'],j['principal']['name']['en'],j['source']['name']['en'],fix_date(j)]
                 df.loc[len(df)] = new_row
     df.to_csv(outfile_path,index=False, float_format='%.3f') 
 

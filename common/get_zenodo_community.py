@@ -1,8 +1,13 @@
 import requests
 import sys
 import pandas as pd
+from pathlib import Path
 
-zenodo_mappings = pd.read_csv('zenodo_ids.csv')
+# Resolve the directory where *this* file lives
+_module_dir = Path(__file__).parent
+# Build an absolute path to sources.csv in the same folder
+_prefix_path = _module_dir / 'zenodo_ids.csv'
+zenodo_mappings = pd.read_csv(_prefix_path)
 zenodo_mappings['SourceRepository'].str.strip()
 
 def get_zenodo_community_id(recid):
