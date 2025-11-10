@@ -1,8 +1,8 @@
 
 UP TO HERE!
-- update the dashboard/data/metadata.csv
-- check the dashboard still works with the updated dashboard/data/metadata.csv
-- deploy before the Researchdata.se annual meeting!!
+DONE for the moment!
+https://david-rayner.shinyapps.io/resarchdatase_publisher_dashboard_demo/
+- deployed before the Researchdata.se annual meeting!!
 
 Notes on what year to use for the date!
 

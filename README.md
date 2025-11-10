@@ -33,11 +33,14 @@ But it is (intended to be) also used by dashboard to get a final update too! Not
 ## Folder dashboard
 shiny app to show results.
 cd dashboard
-shiny run app3.py
+shiny run app.py
 
 
-## Roadmap
-Make web-app first, then start to develop more!
+## Deployment
+https://david-rayner.shinyapps.io/resarchdatase_publisher_dashboard_demo/
+
+
+## Futher ideas
 
 Note that you don't need to actually ship the full dataset listing (metadata.csv) with the dashboard, you only need the pivot information from makeplot1.py!
 
