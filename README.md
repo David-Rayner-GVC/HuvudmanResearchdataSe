@@ -12,13 +12,13 @@ currently reads the mega json dump from file (specified on command line) and wri
 Outfile is also specified on the command line, but target out_data/metadata.csv - keep this as the "raw" csv file.
 Problem here is that there is no URL, so we can't back off to version 1 to see when first published!
 
-### update_sources.py 
-Usage: python update_sources.py out_data/metadata.csv out_data/sources_RAW.csv
+### create_sources.py 
+Usage: python create_sources.py out_data/metadata.csv out_data/sources_RAW.csv
 This creates a file with the shortest id prefix for each data source. This can be used to make a guess at the data source for updates that we get from sitemap/json-ld
-However, the raw output isn't useful, as some SourceRepositories use multiple prefixes
+==> However, the raw output isn't useful, as some SourceRepositories use multiple prefixes!
 And a lot just use a common prefix (the Zenodo prefix)
 So you need to do some customization of the output before you can make it into a format that common/update_metadata.py can use.
-The "fixed"  sources.csv file should be put in folder common
+The "fixed" sources.csv file should be put in folder common
 
 ### jsonl_to_json.py
 Just a utility script, not sure why it is still here.
