@@ -6,6 +6,7 @@ import os.path
 import utils
 import sys
 import pandas as pd
+from get_zenodo_community import get_zenodo_community
 
 def fix_date(j):
     """
@@ -79,14 +80,17 @@ def add_new_datasets_from_sitemap(data,verbose=False):
     new_ids = sitemap_ids.difference(old_ids)
     numIds = len(new_ids)
     if verbose:
-        print(f"found {numIds} new datasaets to process in sitemap")
+        print(f"found {numIds} new datasaets to process in sitemap.xml")
 
   df = pd.DataFrame(columns=["DatasetIdentifier","DatasetIdentifierV1","Publisher", "SourceRepository", "YearPublished"])
   for id in list(new_ids):
     url = "https://researchdata.se/en/catalogue/dataset/" + id
     try:
         j = extract_metadata(url)
-        new_row = [id,id,j['publisher']['name'],utils.classify_url(id=id),j['datePublished'][0:4]]
+        SourceRepository=utils.classify_url(id=id)
+        if SourceRepository=="ZENODO_COMMUNITY":
+          SourceRepository=get_zenodo_community(id,True)
+        new_row = [id,id,j['publisher']['name'],SourceRepository,j['datePublished'][0:4]]
         if verbose:
            print(new_row)
         df.loc[len(df)] = new_row
