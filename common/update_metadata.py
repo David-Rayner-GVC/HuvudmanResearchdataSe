@@ -7,6 +7,7 @@ import utils
 import sys
 import pandas as pd
 from get_zenodo_community import get_zenodo_community
+import argparse
 
 def fix_date(j):
     """
@@ -21,6 +22,24 @@ def fix_date(j):
     else:
         return(int(j['publishedDate'][:4]))
 
+def getMetadataFromApi(datasetIdentifier):
+   """
+   Get metdata from 
+      https://api.researchdata.se/dataset/sites-gvqym0anpryfrtn2cpeuzzwf
+   style link.
+   If strip==True, only return essential metadata
+   """
+   url = "https://api.researchdata.se/dataset/" + datasetIdentifier
+   r = requests.get(url)
+   assert r.status_code == 200
+   dr = json.loads(r.text)
+   
+   metadata={}
+   metadata["DatasetIdentifier"]=dr['dataset']['datasetIdentifier']
+   metadata["Publisher"]=dr['dataset']['principal']["name"]["en"]
+   metadata["SourceRepository"]=dr['dataset']['source']['name']['en']
+   metadata["YearPublished"]=dr['jsonLd']['datePublished'][:4]
+   return metadata
 
 def extract_metadata(url):
     """Extract json-ld metadata from the page and return as a dictionary. 
@@ -46,11 +65,14 @@ def extract_metadata(url):
     return metadata[0]
 
 
-def add_new_datasets_from_sitemap(data,verbose=False):
+def add_new_datasets_from_sitemap(data=None):
   """
   Update metdata by looking for new datasets from sitemap.xml
-  data - dataframe from existing metadata.csv
-  return dataframe in same format
+  Inputs:
+      data - dataframe from existing metadata.csv. None to load everything from sitemap.xml, takes time!
+  Outputs:
+  return dataframe in same format:
+  columns=["DatasetIdentifier","Publisher", "SourceRepository", "YearPublished"]
   """
   
   sitemap_url = "https://researchdata.se/en/sitemap.xml"
@@ -65,61 +87,56 @@ def add_new_datasets_from_sitemap(data,verbose=False):
   sitemap_links = sitemap_links.difference(collection_links)
   sitemap_ids = set(map(lambda x: x.rsplit('/', 1)[-1], sitemap_links))
 
-  if verbose:
+  if utils.verbose:
     print("sitemap.xml contains %d links after removing collections" % len(sitemap_links))
 
   if data is None or data.empty:
     new_ids = sitemap_ids
-    data = []
+    data = pd.DataFrame(columns=["DatasetIdentifier","Publisher", "SourceRepository", "YearPublished"])
+
   else:   
     old_ids = set(data['DatasetIdentifier'])
     old_ids_to_keep = old_ids.intersection(sitemap_ids)
     boolean_mask = data['DatasetIdentifier'].isin(old_ids_to_keep)
     data = data.loc[boolean_mask]
+    oldNotKept=sum(boolean_mask==False)
+    if utils.verbose and (oldNotKept>0):
+      print(f"There were {oldNotKept} datasets in the old list that were no longer found in sitemap.xml")
 
     new_ids = sitemap_ids.difference(old_ids)
     numIds = len(new_ids)
-    if verbose:
+    if utils.verbose:
         print(f"found {numIds} new datasaets to process in sitemap.xml")
 
-  df = pd.DataFrame(columns=["DatasetIdentifier","Publisher", "SourceRepository", "YearPublished"])
+  #df = pd.DataFrame(columns=["DatasetIdentifier","Publisher", "SourceRepository", "YearPublished"])
   for id in list(new_ids):
-    url = "https://researchdata.se/en/catalogue/dataset/" + id
-    try:
-        j = extract_metadata(url)
-        SourceRepository=utils.classify_url(id=id)
-        if SourceRepository=="ZENODO_COMMUNITY":
-          SourceRepository=get_zenodo_community(id,True)
-        new_row = [id,j['publisher']['name'],SourceRepository,j['datePublished'][0:4]]
-        if verbose:
-           print(new_row)
-        df.loc[len(df)] = new_row
-    except KeyboardInterrupt:
-        exit()
-    except:
-        print("WARNING! Error processing new URL " + url)
-     
-  
-  data2 = pd.concat([data, df])
-  return data2
+    new_row=getMetadataFromApi(id)
+    if utils.verbose:
+       print(new_row)
+    data.loc[len(data)] = new_row    
 
-def update_metadata_files(infile, outfile=None):
-    data = pd.read_csv(infile)
-    verbose = outfile is None
-    data2 = add_new_datasets_from_sitemap(data,verbose)
+  return data
+
+def update_metadata_files(infile=None, outfile=None):
+    if infile==None:
+        data = None
+    else:
+        data = pd.read_csv(infile)
+    data2 = add_new_datasets_from_sitemap(data)
     if not outfile is None:
         data2.to_csv(outfile, index=False, float_format='%.3f') 
+    return data2
 
 
   
 if __name__ == "__main__":
-    if not ((len(sys.argv) == 3) or (len(sys.argv) == 2)):
-        print("Usage: python update_metadata.py ../dashboard/data/metadata.csv")
-        print("Usage: python update_metadata.py ../dashboard/data/metadata.csv ../dashboard/data/metadata_new.csv")
-        sys.exit(1)
-
-    if len(sys.argv) == 2:
-        update_metadata_files(sys.argv[1], None)
-    else:
-        update_metadata_files(sys.argv[1], sys.argv[2]) 
-
+    parser = argparse.ArgumentParser(description ='Create or update the metadata.csv list.')
+    parser.add_argument('--infile',
+                    default =None,
+                    help ='existing metadata.csv file to read and only download updates to it')
+    parser.add_argument('--outfile',
+                    default =None,
+                    help ='file to output to. Suggest ../dashboard/data/metadata_new.csv')
+    args = parser.parse_args()
+    
+    update_metadata_files(args.infile, args.outfile)

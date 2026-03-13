@@ -6,6 +6,8 @@ import re
 import pandas as pd
 from pathlib import Path
 
+verbose = True
+
 dorisPattern = re.compile(r"\d\d\d\d-\d+-\d+")
 dorisExtPattern = re.compile(r"\d\d\d\d-\d+")
 
@@ -41,7 +43,8 @@ def get_urls_from_sitemap(url) -> list:
                 website_links.append(item.text)
         except TypeError:
             pass
-    print("Found " + str(len(website_links)) + " links")
+    if verbose:
+        print("Found " + str(len(website_links)) + " links in sitemap")
     return(website_links)
 
 def classify_url(id=None, url=None):
