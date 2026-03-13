@@ -1,6 +1,10 @@
 
 UP TO HERE!
-DONE for the moment!
+
+Working on branch 2026a.
+ - have updated update_metadata.py so it now loads using the API
+ - now need to update the dashboard to use the new API-using code. Might not need anything!
+
 https://david-rayner.shinyapps.io/resarchdatase_publisher_dashboard_demo/
 - deployed before the Researchdata.se annual meeting!!
 
