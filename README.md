@@ -6,6 +6,7 @@ Stuff useful for both predata and dashboard!
 
 ## Folder prepdata
 Code for creating a lite csv file that can be used in the dashboard.
+Now with create_aggregated.py that creates a json file (dashboard/data/stats.json) with pre-aggregated counts! But you have to run this AFTER you have updated the metadata, wherever that happens!
 
 ### read_metadata.py
 currently reads the mega json dump from file (specified on command line) and writes a csv file with "Publisher", "SourceRepository", "YearPublished".
