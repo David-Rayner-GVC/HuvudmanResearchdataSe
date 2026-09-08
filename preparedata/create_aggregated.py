@@ -1,6 +1,16 @@
 import pandas as pd
 import json
 import os, sys
+import argparse
+
+# import from scrapeREDA
+from pathlib import Path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+common_path = Path(__file__).resolve().parent.parent / "scrapeREDA"
+# Add to sys.path if not already there
+if str(common_path) not in sys.path:
+    sys.path.insert(0, str(common_path))  # insert(0) so it takes precedence
+import scrapeREDA
 
 def pre_strip(df):
     # Filter and keep only needed columns
@@ -47,6 +57,7 @@ def serialize_counts(counts):
 
 def create_aggregated(df):
     # calculate aggregated stats for df, return as data structure
+    df = pre_strip(df)
     Publishers = df['Publisher'].unique().tolist()
     stats = {
         publisher: serialize_counts(calculate_counts_for_a_publisher(df, publisher))
@@ -60,13 +71,24 @@ def write_stats(stats, filename):
          json.dump(aggregatedStats, f)
 
 if __name__ == "__main__":
-    # call with one arg if you want to save to a file, presumably data/stats.json
-    df = pd.read_csv('../dashboard/data/metadata.csv')
-    df = pre_strip(df)
+    # Calculate the aggregated counts for all organizations/sources
+    # call with -j if you want to save to a file, presumably ../dashboard/data/stats.json
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--csv", help="read from a csv file. If missing, scrape from web")
+    parser.add_argument("-j", "--json", help="write to a json file (rather than standard output)")
+    parser.add_argument("--test", action="store_true", help="only process first 30 datasets as a test")
+
+    args = parser.parse_args()
+
+    if args.csv:
+      df = pd.read_csv(args.csv)
+    else:
+      df = scrapeREDA.scrapeREDA('dataframe',test=args.test,debug=1)
+
     aggregatedStats = create_aggregated(df)
 
-    if len(sys.argv) == 2:
-        write_stats(aggregatedStats, sys.argv[1])
+    if args.json:
+        write_stats(aggregatedStats, args.json)
     else:
         print(aggregatedStats)
 

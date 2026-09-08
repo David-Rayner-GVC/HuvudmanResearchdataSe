@@ -6,7 +6,15 @@ Stuff useful for both predata and dashboard!
 
 ## Folder prepdata
 Code for creating a lite csv file that can be used in the dashboard.
-Now with create_aggregated.py that creates a json file (dashboard/data/stats.json) with pre-aggregated counts! But you have to run this AFTER you have updated the metadata, wherever that happens!
+Now added create_aggregated.py that creates a json file (dashboard/data/stats.json) with pre-aggregated counts! *But this is not yet used in the dashobard.* This should obselete a lot of other code, but I haven't cleaned up yet.
+To simply create the json file without using the lite csv file as intermediary:
+```
+python3 create_aggregated.py -j ../dashboard/data/stats.json
+```
+
+## Folder scrapeReda
+Code for downloading dataset information via sitemap.xml + https://api.researchdata.se/*
+Main routine is scrapeREDA(format='dict|dataframe',test=Bool,debug=None|int)
 
 ### read_metadata.py
 currently reads the mega json dump from file (specified on command line) and writes a csv file with "Publisher", "SourceRepository", "YearPublished".
