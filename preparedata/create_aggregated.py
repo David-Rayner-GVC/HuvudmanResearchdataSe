@@ -31,7 +31,7 @@ def pre_strip(df):
     sub = df.loc[:, ["Publisher", "YearPublished", "SourceRepository"]]
 
     # only use "KTH Royal Institute of Technology" not "Royal Institute of Technology"
-    df["Publisher"] = df["Publisher"].replace(
+    sub["Publisher"] = df["Publisher"].replace(
         "Royal Institute of Technology",
         "KTH Royal Institute of Technology"
     )
@@ -97,7 +97,7 @@ def create_aggregated(df):
         for publisher in all_publishers
         if publisher not in SND_PARTNERS
     )
-    
+
     Publishers = partner_publishers + other_publishers
 
     stats = {
