@@ -12,9 +12,29 @@ if str(common_path) not in sys.path:
     sys.path.insert(0, str(common_path))  # insert(0) so it takes precedence
 import scrapeREDA
 
+SND_PARTNERS = [
+    "University of Gothenburg",
+    "Chalmers University of Technology",
+    "Karolinska Institutet",
+    "KTH Royal Institute of Technology",
+    "Lund University",
+    "Stockholm University",
+    "Swedish University of Agricultural Sciences",
+    "Umeå University",
+    "Uppsala University",
+]
+
+
 def pre_strip(df):
+    # Clean up
     # Filter and keep only needed columns
     sub = df.loc[:, ["Publisher", "YearPublished", "SourceRepository"]]
+
+    # only use "KTH Royal Institute of Technology" not "Royal Institute of Technology"
+    df["Publisher"] = df["Publisher"].replace(
+        "Royal Institute of Technology",
+        "KTH Royal Institute of Technology"
+    )
 
     # Make sure YearPublished is numeric years; drop rows where it can't be coerced
     sub = sub.copy()
@@ -56,13 +76,37 @@ def serialize_counts(counts):
     return data
 
 def create_aggregated(df):
-    # calculate aggregated stats for df, return as data structure
+
+    # Calculate aggregated stats for df, return as data structure
+
     df = pre_strip(df)
-    Publishers = df['Publisher'].unique().tolist()
+
+    # Publishers actually present in the data
+    all_publishers = df["Publisher"].dropna().unique().tolist()
+
+    # SND partners first, in the specified order
+    partner_publishers = [
+        publisher
+        for publisher in SND_PARTNERS
+        if publisher in all_publishers
+    ]
+
+    # Everything else afterwards
+    other_publishers = sorted(
+        publisher
+        for publisher in all_publishers
+        if publisher not in SND_PARTNERS
+    )
+    
+    Publishers = partner_publishers + other_publishers
+
     stats = {
-        publisher: serialize_counts(calculate_counts_for_a_publisher(df, publisher))
+        publisher: serialize_counts(
+            calculate_counts_for_a_publisher(df, publisher)
+        )
         for publisher in Publishers
     }
+
     return stats
 
 def write_stats(stats, filename):

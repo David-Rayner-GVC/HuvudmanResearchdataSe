@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 import requests
 import config
 import concurrent.futures
+import argparse
+
 
 sitemap_url = "https://researchdata.se/en/catalogue/sitemap.xml"
 
@@ -130,5 +132,19 @@ def scrapeREDA(format='dict',test=False,debug=None):
     return results
 
 if __name__ == '__main__':
-    scrapeREDA(format='dict',test=True)
-    print(results)
+    # Download data, presumably you want to save to a csv file?
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--csv", help="write to a csv file. If missing, print results")
+    parser.add_argument("--test", action="store_true", help="only process first 30 datasets as a test")
+    parser.add_argument("-d", "--debug", type=int, default=1, help="Output debug level, default 1. quite is 0")
+    args = parser.parse_args()
+
+    config.debug = args.debug
+
+    df = scrapeREDA(format='DataFrame',test=args.test)
+    if args.csv:
+        if config.debug > 0:
+            print("writing output to "+args.csv)
+        df.to_csv(args.csv, index=False)
+    else:
+        print(results)
